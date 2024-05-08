@@ -1,5 +1,4 @@
 const { nanoid } = require('nanoid');
-// files
 const books = require('./books.manager');
 
 const addNewBook = (request, h) => {
@@ -15,7 +14,6 @@ const addNewBook = (request, h) => {
     } = request.payload;
 
     if (!name) {
-        // Client tidak melampirkan properti name pada request body
         const response = h
             .response({
                 status: 'fail',
@@ -26,7 +24,6 @@ const addNewBook = (request, h) => {
     }
 
     if (readPage > pageCount) {
-        // Client melampirkan nilai properti readPage yang lebih besar dari nilai properti pageCount
         const response = h
             .response({
                 status: 'fail',
@@ -43,6 +40,7 @@ const addNewBook = (request, h) => {
     const updatedAt = insertedAt;
 
     const newBook = {
+        id,
         name,
         year,
         author,
@@ -51,18 +49,16 @@ const addNewBook = (request, h) => {
         pageCount,
         readPage,
         reading,
-        id,
         finished,
         insertedAt,
         updatedAt,
     };
 
-    books.push(newBook); // push to books array
+    books.push(newBook);
 
-    const isSuccess = books.filter((note) => note.id === id).length > 0; // cek if newBook pushed
+    const success = books.filter((note) => note.id === id).length > 0;
 
-    if (isSuccess) {
-        // Bila buku berhasil dimasukkan
+    if (success) {
         const response = h
             .response({
                 status: 'success',
@@ -75,7 +71,6 @@ const addNewBook = (request, h) => {
         return response;
     }
 
-    // Server gagal memasukkan buku karena alasan umum (generic error).
     const response = h
         .response({
             status: 'fail',
@@ -89,7 +84,6 @@ const getAllBooks = (request, h) => {
     const { name, reading, finished } = request.query;
 
     if (!name && !reading && !finished) {
-        // kalau tidak ada query
         const response = h
             .response({
                 status: 'success',
@@ -107,8 +101,7 @@ const getAllBooks = (request, h) => {
     }
 
     if (name) {
-        const filteredBooksName = books.filter((book) => {
-            // kalau ada query name
+        const filteredName = books.filter((book) => {
             const nameRegex = new RegExp(name, 'gi');
             return nameRegex.test(book.name);
         });
@@ -117,7 +110,7 @@ const getAllBooks = (request, h) => {
             .response({
                 status: 'success',
                 data: {
-                    books: filteredBooksName.map((book) => ({
+                    books: filteredName.map((book) => ({
                         id: book.id,
                         name: book.name,
                         publisher: book.publisher,
@@ -130,8 +123,7 @@ const getAllBooks = (request, h) => {
     }
 
     if (reading) {
-        // kalau ada query reading
-        const filteredBooksReading = books.filter(
+        const filteredReading = books.filter(
             (book) => Number(book.reading) === Number(reading),
         );
 
@@ -139,7 +131,7 @@ const getAllBooks = (request, h) => {
             .response({
                 status: 'success',
                 data: {
-                    books: filteredBooksReading.map((book) => ({
+                    books: filteredReading.map((book) => ({
                         id: book.id,
                         name: book.name,
                         publisher: book.publisher,
@@ -151,8 +143,7 @@ const getAllBooks = (request, h) => {
         return response;
     }
 
-    // kalau ada query finished
-    const filteredBooksFinished = books.filter(
+    const filteredFinished = books.filter(
         (book) => Number(book.finished) === Number(finished),
     );
 
@@ -160,7 +151,7 @@ const getAllBooks = (request, h) => {
         .response({
             status: 'success',
             data: {
-                books: filteredBooksFinished.map((book) => ({
+                books: filteredFinished.map((book) => ({
                     id: book.id,
                     name: book.name,
                     publisher: book.publisher,
@@ -175,10 +166,9 @@ const getAllBooks = (request, h) => {
 const getDetailBook = (request, h) => {
     const { bookId } = request.params;
 
-    const book = books.filter((n) => n.id === bookId)[0]; // find book by id
+    const book = books.filter((n) => n.id === bookId)[0];
 
     if (book) {
-        // Bila buku dengan id yang dilampirkan ditemukan
         const response = h
             .response({
                 status: 'success',
@@ -190,7 +180,6 @@ const getDetailBook = (request, h) => {
         return response;
     }
 
-    // Bila buku dengan id yang dilampirkan oleh client tidak ditemukan
     const response = h
         .response({
             status: 'fail',
@@ -215,7 +204,6 @@ const updateBook = (request, h) => {
     } = request.payload;
 
     if (!name) {
-        // Client tidak melampirkan properti name pada request body
         const response = h
             .response({
                 status: 'fail',
@@ -226,7 +214,6 @@ const updateBook = (request, h) => {
     }
 
     if (readPage > pageCount) {
-        // Client melampirkan nilai properti readPage yang lebih besar dari nilai properti pageCount
         const response = h
             .response({
                 status: 'fail',
@@ -240,7 +227,7 @@ const updateBook = (request, h) => {
     const finished = pageCount === readPage;
     const updatedAt = new Date().toISOString();
 
-    const index = books.findIndex((note) => note.id === bookId); // find book by id
+    const index = books.findIndex((note) => note.id === bookId);
 
     if (index !== -1) {
         books[index] = {
@@ -257,7 +244,6 @@ const updateBook = (request, h) => {
             updatedAt,
         };
 
-        // Bila buku berhasil diperbarui
         const response = h
             .response({
                 status: 'success',
@@ -267,7 +253,6 @@ const updateBook = (request, h) => {
         return response;
     }
 
-    // id yang dilampirkan oleh client tidak ditemukkan oleh server
     const response = h
         .response({
             status: 'fail',
@@ -280,12 +265,11 @@ const updateBook = (request, h) => {
 const removeBook = (request, h) => {
     const { bookId } = request.params;
 
-    const index = books.findIndex((note) => note.id === bookId); // find book by id
+    const index = books.findIndex((note) => note.id === bookId);
 
     if (index !== -1) {
         books.splice(index, 1);
 
-        // Bila id dimiliki oleh salah satu buku
         const response = h
             .response({
                 status: 'success',
@@ -295,7 +279,6 @@ const removeBook = (request, h) => {
         return response;
     }
 
-    // Bila id yang dilampirkan tidak dimiliki oleh buku manapun
     const response = h
         .response({
             status: 'fail',
