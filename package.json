@@ -1,0 +1,25 @@
+{
+  "name": "project-bookshelf-api",
+  "version": "1.0.0",
+  "description": "final project backend submission for dicoding",
+  "main": "./src/app.js",
+  "scripts": {
+    "start": "node ./src/app.js",
+    "devStart": "nodemon ./src/app.js",
+    "lint": "eslint ./src"
+  },
+  "keywords": [],
+  "author": "dervaag",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.9",
+    "nanoid": "^3.3.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "nodemon": "^3.1.0"
+  }
+}
